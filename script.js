@@ -8,6 +8,11 @@ const clearAll = document.getElementById("clearAll");
 const resetAll = document.getElementById("resetAll");
 const rewardText = document.getElementById("nextReward");
 const rewardNotice = document.getElementById("rewardNotice");
+const celebrationContainer = document.getElementById("celebrationContainer");
+const completionModal = document.getElementById("completionModal");
+const modalCloseBtn = document.getElementById("modalCloseBtn");
+const modalTitle = document.getElementById("modalTitle");
+const modalMessage = document.getElementById("modalMessage");
 
 const STORAGE_KEY = "householdRpgState";
 
@@ -98,7 +103,46 @@ function addHistoryEntry(task) {
   });
 }
 
-function completeTask(taskId) {
+function triggerCelebration(x, y) {
+  const emojis = ["⭐", "✨", "🎉", "🎊", "💫", "🌟"];
+  const celebrationCount = 12;
+
+  for (let i = 0; i < celebrationCount; i++) {
+    const pop = document.createElement("div");
+    pop.className = `pop ${Math.random() > 0.5 ? "star" : "emoji"}`;
+    pop.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    pop.style.left = x + "px";
+    pop.style.top = y + "px";
+
+    const offsetX = (Math.random() - 0.5) * 100;
+    const offsetY = (Math.random() - 0.5) * 100;
+    pop.style.setProperty("--offsetX", offsetX + "px");
+    pop.style.setProperty("--offsetY", offsetY + "px");
+
+    celebrationContainer.appendChild(pop);
+
+    setTimeout(() => pop.remove(), 1000);
+  }
+}
+
+function showCompletionModal(taskTitle, xpGained) {
+  modalTitle.textContent = `${taskTitle} 完了！`;
+  modalMessage.textContent = `${xpGained} XP を獲得しました！`;
+  completionModal.classList.add("active");
+}
+
+function closeCompletionModal() {
+  completionModal.classList.remove("active");
+}
+
+modalCloseBtn.addEventListener("click", closeCompletionModal);
+completionModal.addEventListener("click", (event) => {
+  if (event.target === completionModal) {
+    closeCompletionModal();
+  }
+});
+
+function completeTask(taskId, buttonElement) {
   const task = taskCatalog.find((item) => item.id === taskId);
   if (!task) return;
   addHistoryEntry(task);
@@ -106,6 +150,15 @@ function completeTask(taskId) {
   saveState();
   renderHistory();
   updateStatus();
+
+  // ポップアップウィンドウを表示
+  showCompletionModal(task.title, task.xp);
+
+  // ボタン位置でパーティクルアニメーション
+  if (buttonElement) {
+    const rect = buttonElement.getBoundingClientRect();
+    triggerCelebration(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  }
 }
 
 function clearHistory() {
@@ -141,7 +194,9 @@ function renderTaskCatalog() {
 
     const button = document.createElement("button");
     button.textContent = "完了する";
-    button.addEventListener("click", () => completeTask(task.id));
+    button.addEventListener("click", (event) => {
+      completeTask(task.id, event.target);
+    });
 
     li.appendChild(title);
     li.appendChild(meta);
