@@ -1,19 +1,35 @@
-const questForm = document.getElementById("questForm");
-const questTitle = document.getElementById("questTitle");
-const questXp = document.getElementById("questXp");
-const questItems = document.getElementById("questItems");
+const taskItems = document.getElementById("taskItems");
+const historyItems = document.getElementById("historyItems");
 const levelValue = document.getElementById("levelValue");
 const xpValue = document.getElementById("xpValue");
 const nextLevelXp = document.getElementById("nextLevelXp");
 const xpFill = document.getElementById("xpFill");
 const clearAll = document.getElementById("clearAll");
+const resetAll = document.getElementById("resetAll");
+const rewardText = document.getElementById("nextReward");
+const rewardNotice = document.getElementById("rewardNotice");
 
 const STORAGE_KEY = "householdRpgState";
+
+const taskCatalog = [
+  { id: "trash", title: "ゴミ出し", xp: 20 },
+  { id: "dishes", title: "皿洗い", xp: 15 },
+  { id: "vacuum", title: "掃除機かけ", xp: 30 },
+  { id: "cooking", title: "料理", xp: 35 },
+  { id: "laundry", title: "洗濯", xp: 25 },
+];
+
+const rewardCatalog = {
+  2: "好きなデザート",
+  3: "リラックスタイム30分",
+  4: "映画鑑賞",
+  5: "スペシャルボーナス",
+};
 
 const defaultState = {
   xp: 0,
   level: 1,
-  quests: [],
+  history: [],
 };
 
 let state = loadState();
@@ -21,11 +37,11 @@ let state = loadState();
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState;
+    if (!raw) return JSON.parse(JSON.stringify(defaultState));
     return JSON.parse(raw);
   } catch (error) {
     console.warn("ロードエラー", error);
-    return defaultState;
+    return JSON.parse(JSON.stringify(defaultState));
   }
 }
 
@@ -37,6 +53,18 @@ function getXpForNextLevel(level) {
   return 100 + (level - 1) * 40;
 }
 
+function getNextLevelReward(level) {
+  return rewardCatalog[level + 1] || "次のレベルで報酬がもらえます";
+}
+
+function showRewardNotice(message) {
+  rewardNotice.textContent = message;
+  rewardNotice.classList.add("visible");
+  setTimeout(() => {
+    rewardNotice.classList.remove("visible");
+  }, 5000);
+}
+
 function updateStatus() {
   const nextXp = getXpForNextLevel(state.level);
   levelValue.textContent = state.level;
@@ -44,86 +72,121 @@ function updateStatus() {
   nextLevelXp.textContent = nextXp;
   const fill = Math.min((state.xp / nextXp) * 100, 100);
   xpFill.style.width = `${fill}%`;
+  rewardText.querySelector("span").textContent = getNextLevelReward(state.level);
 }
 
-function addQuest(title, xp) {
-  state.quests.push({ id: Date.now(), title, xp, done: false });
-  saveState();
-  renderQuests();
-}
-
-function completeQuest(id) {
-  const quest = state.quests.find((item) => item.id === id);
-  if (!quest || quest.done) return;
-  quest.done = true;
-  state.xp += quest.xp;
+function earnXp(amount) {
+  state.xp += amount;
+  const rewards = [];
   while (state.xp >= getXpForNextLevel(state.level)) {
     state.xp -= getXpForNextLevel(state.level);
     state.level += 1;
+    rewards.push(rewardCatalog[state.level] || `レベル${state.level}到達`);
   }
+
+  if (rewards.length > 0) {
+    showRewardNotice(`レベルアップ！ ${state.level}になりました。報酬: ${rewards.join("、 ")}`);
+  }
+}
+
+function addHistoryEntry(task) {
+  state.history.unshift({
+    id: Date.now(),
+    title: task.title,
+    xp: task.xp,
+    date: new Date().toLocaleString(),
+  });
+}
+
+function completeTask(taskId) {
+  const task = taskCatalog.find((item) => item.id === taskId);
+  if (!task) return;
+  addHistoryEntry(task);
+  earnXp(task.xp);
   saveState();
-  renderQuests();
+  renderHistory();
   updateStatus();
 }
 
-function clearQuestList() {
-  state.quests = [];
+function clearHistory() {
+  state.history = [];
   saveState();
-  renderQuests();
+  renderHistory();
 }
 
-function renderQuests() {
-  questItems.innerHTML = "";
-  if (state.quests.length === 0) {
-    questItems.innerHTML = "<li class='empty'>クエストがありません。新しいクエストを追加してください。</li>";
+function resetAllProgress() {
+  if (!confirm("この操作は元に戻せません。レベル、XP、実施履歴がすべて消えます。本当に実行しますか？")) {
+    return;
+  }
+  state = JSON.parse(JSON.stringify(defaultState));
+  saveState();
+  renderHistory();
+  updateStatus();
+  showRewardNotice("全データをリセットしました。最初からやり直せます。");
+}
+
+function renderTaskCatalog() {
+  taskItems.innerHTML = "";
+  taskCatalog.forEach((task) => {
+    const li = document.createElement("li");
+    li.className = "task-card";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.textContent = task.title;
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = `${task.xp} XP`;
+
+    const button = document.createElement("button");
+    button.textContent = "完了する";
+    button.addEventListener("click", () => completeTask(task.id));
+
+    li.appendChild(title);
+    li.appendChild(meta);
+    li.appendChild(button);
+    taskItems.appendChild(li);
+  });
+}
+
+function renderHistory() {
+  historyItems.innerHTML = "";
+  if (state.history.length === 0) {
+    historyItems.innerHTML = "<li class='empty'>まだ実施した家事がありません。上の家事を選択してみましょう。</li>";
     return;
   }
 
-  state.quests.forEach((quest) => {
+  state.history.forEach((entry) => {
     const li = document.createElement("li");
-    li.className = `quest-card${quest.done ? " completed" : ""}`;
+    li.className = "quest-card completed";
 
     const info = document.createElement("div");
     info.className = "info";
 
     const title = document.createElement("div");
     title.className = "title";
-    title.textContent = quest.title;
+    title.textContent = entry.title;
 
     const meta = document.createElement("div");
     meta.className = "meta";
-    meta.textContent = `XP ${quest.xp} / ${quest.done ? "完了" : "未完了"}`;
+    meta.textContent = `${entry.xp} XP — ${entry.date}`;
 
     info.appendChild(title);
     info.appendChild(meta);
-
-    const button = document.createElement("button");
-    button.textContent = quest.done ? "完了" : "完了にする";
-    button.disabled = quest.done;
-    button.addEventListener("click", () => completeQuest(quest.id));
-
     li.appendChild(info);
-    li.appendChild(button);
-    questItems.appendChild(li);
+    historyItems.appendChild(li);
   });
 }
 
-questForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const title = questTitle.value.trim();
-  const xp = Number(questXp.value);
-  if (!title || xp <= 0) return;
-  addQuest(title, xp);
-  questForm.reset();
-  questXp.value = "20";
-  questTitle.focus();
-});
-
 clearAll.addEventListener("click", () => {
-  if (confirm("本当にすべてのクエストを削除しますか？")) {
-    clearQuestList();
+  if (confirm("本当に実施済み家事の履歴を消しますか？")) {
+    clearHistory();
   }
 });
 
+resetAll.addEventListener("click", resetAllProgress);
+
+renderTaskCatalog();
+renderHistory();
 updateStatus();
-renderQuests();

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>家事RPG クエスト管理</title>
+    <title>家事RPG</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -11,7 +11,7 @@
       <section class="hero">
         <div>
           <h1>家事RPG</h1>
-          <p>クエストをクリアしてXPを稼ぎ、レベルアップしよう！</p>
+          <p>家事を選んで実行し、経験値を貯めてレベルアップ報酬をゲットしよう。</p>
         </div>
         <div class="status-card">
           <div class="level">レベル <span id="levelValue">1</span></div>
@@ -19,30 +19,26 @@
             <div id="xpFill" class="xp-fill"></div>
           </div>
           <div class="xp-text"><span id="xpValue">0</span> / <span id="nextLevelXp">100</span> XP</div>
+          <div class="reward-text" id="nextReward">次のレベル報酬: <span>好きなデザート</span></div>
+          <div class="reward-notice" id="rewardNotice" aria-live="polite"></div>
         </div>
       </section>
 
-      <section class="quest-form">
-        <h2>新しいクエストを追加</h2>
-        <form id="questForm">
-          <label>
-            クエスト名
-            <input id="questTitle" type="text" placeholder="例: ゴミ出し" required />
-          </label>
-          <label>
-            XP報酬
-            <input id="questXp" type="number" min="10" value="20" required />
-          </label>
-          <button type="submit">クエストを追加</button>
-        </form>
+      <section class="task-library">
+        <h2>家事を選ぶ</h2>
+        <p class="library-note">実施した家事を選択すると、こちらで設定した経験値が獲得できます。</p>
+        <ul id="taskItems" class="tasks"></ul>
       </section>
 
-      <section class="quest-list">
+      <section class="history-list">
         <div class="section-header">
-          <h2>クエスト一覧</h2>
-          <button id="clearAll">すべてクリア</button>
+          <h2>実施済み家事</h2>
+          <div class="button-group">
+            <button id="clearAll">履歴を消す</button>
+            <button id="resetAll" class="danger-button">全データリセット</button>
+          </div>
         </div>
-        <ul id="questItems" class="quests"></ul>
+        <ul id="historyItems" class="quests"></ul>
       </section>
     </main>
 
