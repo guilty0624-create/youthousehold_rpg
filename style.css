@@ -38,8 +38,13 @@
 }
 
 .modal-icon {
-  font-size: 4rem;
   margin-bottom: 16px;
+}
+
+.modal-image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
   animation: bounce 0.6s ease-in-out infinite;
 }
 

@@ -13,6 +13,13 @@ const completionModal = document.getElementById("completionModal");
 const modalCloseBtn = document.getElementById("modalCloseBtn");
 const modalTitle = document.getElementById("modalTitle");
 const modalMessage = document.getElementById("modalMessage");
+const modalImage = document.getElementById("modalImage");
+
+const celebrationImages = [
+  "images/celebration1.png",
+  "images/celebration2.png",
+  "images/celebration3.png",
+];
 
 const STORAGE_KEY = "householdRpgState";
 
@@ -125,9 +132,14 @@ function triggerCelebration(x, y) {
   }
 }
 
+function getRandomCelebrationImage() {
+  return celebrationImages[Math.floor(Math.random() * celebrationImages.length)];
+}
+
 function showCompletionModal(taskTitle, xpGained) {
   modalTitle.textContent = `${taskTitle} 完了！`;
   modalMessage.textContent = `${xpGained} XP を獲得しました！`;
+  modalImage.src = getRandomCelebrationImage();
   completionModal.classList.add("active");
 }
 
