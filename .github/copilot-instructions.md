@@ -1,0 +1,17 @@
+- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+- [x] Clarify Project Requirements
+	- Browser-based household chore RPG app.
+- [x] Scaffold the Project
+	- Static HTML/CSS/JS starter project.
+- [x] Customize the Project
+	- Implement quest tracking, XP, and level-up UI.
+- [x] Install Required Extensions
+	- No extensions required for static web app.
+- [x] Compile the Project
+	- No compilation needed for static HTML/CSS/JS.
+- [x] Create and Run Task
+	- No tasks required.
+- [x] Launch the Project
+	- User can open index.html in browser.
+- [x] Ensure Documentation is Complete
+	- README.md created with project summary and launch instructions.

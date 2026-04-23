@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>家事RPG クエスト管理</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div>
+          <h1>家事RPG</h1>
+          <p>クエストをクリアしてXPを稼ぎ、レベルアップしよう！</p>
+        </div>
+        <div class="status-card">
+          <div class="level">レベル <span id="levelValue">1</span></div>
+          <div class="xp-bar">
+            <div id="xpFill" class="xp-fill"></div>
+          </div>
+          <div class="xp-text"><span id="xpValue">0</span> / <span id="nextLevelXp">100</span> XP</div>
+        </div>
+      </section>
+
+      <section class="quest-form">
+        <h2>新しいクエストを追加</h2>
+        <form id="questForm">
+          <label>
+            クエスト名
+            <input id="questTitle" type="text" placeholder="例: ゴミ出し" required />
+          </label>
+          <label>
+            XP報酬
+            <input id="questXp" type="number" min="10" value="20" required />
+          </label>
+          <button type="submit">クエストを追加</button>
+        </form>
+      </section>
+
+      <section class="quest-list">
+        <div class="section-header">
+          <h2>クエスト一覧</h2>
+          <button id="clearAll">すべてクリア</button>
+        </div>
+        <ul id="questItems" class="quests"></ul>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
