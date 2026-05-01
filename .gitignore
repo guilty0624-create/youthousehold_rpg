@@ -1,0 +1,19 @@
+# ローカル環境
+.DS_Store
+.env
+.env.local
+*.log
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+desktop.ini
+
+# ローカルストレージ（テスト用）
+*.tmp

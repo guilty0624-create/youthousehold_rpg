@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>部屋を飾ろう - 家事RPG</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="decorator.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <h1 class="nav-title">家事RPG</h1>
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">クエスト</a>
+          <a href="decorator.html" class="nav-link active">部屋を飾る</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="app-shell">
+      <section class="decorator-hero">
+        <h1>部屋を飾ろう</h1>
+        <p>クエストで獲得したポイントを使って、部屋や街を自分好みに飾ろう！</p>
+        <div class="decorator-points">
+          <span>デコポイント:</span>
+          <span id="decorPoints" class="points-value">0</span>
+        </div>
+      </section>
+
+      <section class="decorator-main">
+        <div class="canvas-area">
+          <div id="roomCanvas" class="room-canvas">
+            <div class="room-background"></div>
+            <div id="decorItems" class="decor-items"></div>
+          </div>
+        </div>
+
+        <aside class="decorator-panel">
+          <h2>デコアイテム</h2>
+          <div class="category-tabs">
+            <button class="category-btn active" data-category="furniture">家具</button>
+            <button class="category-btn" data-category="plants">植物</button>
+            <button class="category-btn" data-category="lights">ライト</button>
+            <button class="category-btn" data-category="wall">壁紙</button>
+          </div>
+
+          <div id="itemList" class="item-list"></div>
+        </aside>
+      </section>
+
+      <section class="decorator-info">
+        <h2>選択中のアイテム</h2>
+        <div class="item-info">
+          <div id="itemDetails" class="item-details">
+            <p>キャンバスをクリックしてアイテムを配置します</p>
+          </div>
+          <div class="info-actions">
+            <button id="rotateBtn" class="action-btn" disabled>回転</button>
+            <button id="deleteBtn" class="action-btn" disabled>削除</button>
+            <button id="resetBtn" class="action-btn">すべてリセット</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="decorator.js"></script>
+  </body>
+</html>
