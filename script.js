@@ -168,10 +168,17 @@ function getRandomCelebrationImage() {
   return celebrationImages[Math.floor(Math.random() * celebrationImages.length)];
 }
 
-function showCompletionModal(taskTitle, xpGained) {
-  modalTitle.textContent = `${taskTitle} 完了！`;
-  modalMessage.textContent = `${xpGained} XP を獲得しました！`;
-  modalImage.src = getRandomCelebrationImage();
+function showCompletionModal(task, xp, decorPoints) {
+  modalTitle.textContent = `${task.title} 完了！`;
+  const message = document.getElementById('modalMessage');
+  if (message) {
+    message.innerHTML = `
+      <div style="line-height: 1.6;">
+        <p>🌟 経験値: +${xp} XP</p>
+        <p>🎨 デコポイント: +${decorPoints}</p>
+      </div>
+    `;
+  }
   completionModal.classList.add("active");
 }
 
@@ -196,7 +203,7 @@ function completeTask(taskId, buttonElement) {
   updateStatus();
 
   // ポップアップウィンドウを表示
-  showCompletionModal(task.title, task.xp);
+  showCompletionModal(task, task.xp, calculateDecorPoints(task.xp));
 
   // ボタン位置でパーティクルアニメーション
   if (buttonElement) {
@@ -225,26 +232,22 @@ function resetAllProgress() {
 function renderTaskCatalog() {
   taskItems.innerHTML = "";
   taskCatalog.forEach((task) => {
+    const decorPoints = calculateDecorPoints(task.xp);
+
     const li = document.createElement("li");
     li.className = "task-card";
+    li.innerHTML = `
+      <div>
+        <div class="title">${task.title}</div>
+        <div class="meta">
+          <span>⭐ ${task.xp} XP</span>
+          <span class="decor-meta">🎨 +${decorPoints} デコポイント</span>
+        </div>
+      </div>
+      <button class="task-btn" type="button">完了する</button>
+    `;
 
-    const title = document.createElement("div");
-    title.className = "title";
-    title.textContent = task.title;
-
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    meta.textContent = `${task.xp} XP`;
-
-    const button = document.createElement("button");
-    button.textContent = "完了する";
-    button.addEventListener("click", (event) => {
-      completeTask(task.id, event.target);
-    });
-
-    li.appendChild(title);
-    li.appendChild(meta);
-    li.appendChild(button);
+    li.querySelector('button').addEventListener('click', () => completeTask(task.id));
     taskItems.appendChild(li);
   });
 }
@@ -362,3 +365,7 @@ fetchWeather();
 renderTaskCatalog();
 renderHistory();
 updateStatus();
+
+function calculateDecorPoints(xp) {
+  return Math.ceil(xp / 5);
+}
